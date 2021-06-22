@@ -4,6 +4,8 @@ import * as sqs from '@aws-cdk/aws-sqs';
 import * as lambda from '@aws-cdk/aws-lambda';
 import * as apigw from '@aws-cdk/aws-apigateway';
 import * as cdk from '@aws-cdk/core';
+import {HitCounter} from './hitcounter'
+
 export class LearningCdkStack extends cdk.Stack {
   constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -14,8 +16,12 @@ export class LearningCdkStack extends cdk.Stack {
       handler: 'hello.handler'
     })
 
+    const helloWithCounter = new HitCounter(this, 'HelloHitCounter', {
+      downstream: hello
+    })
+
     new apigw.LambdaRestApi(this, 'Endpoint', {
-      handler: hello
+      handler: helloWithCounter.handler
     })
 
     // const queue = new sqs.Queue(this, 'LearningCdkQueue', {
